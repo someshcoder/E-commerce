@@ -23,8 +23,8 @@ export function Hero() {
                 Shop Now
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Link>
-              <Link to="/" className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                View Collection
+              <Link to="/about" className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                View Page
               </Link>
             </div>
           </div>
