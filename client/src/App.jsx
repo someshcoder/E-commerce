@@ -12,6 +12,8 @@ import Contact from "./pages/Contact";
 import Profile from "./pages/Profile";
 import Settings from './pages/Settings';
 import AdminDashboard from './pages/AdminDashboard';
+import CustomerManagement from './pages/CustomerManagement';
+import ProductsManagement from './pages/ProductsManagement';
 import Checkout from './pages/Checkout';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -44,9 +46,10 @@ function App() {
           
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/admin/products" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/products" element={<ProtectedRoute><ProductsManagement /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/orders" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/customers" element={<ProtectedRoute><CustomerManagement /></ProtectedRoute>} />
         </Routes>
 
         <Footer />
