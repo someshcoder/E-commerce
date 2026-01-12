@@ -1,16 +1,20 @@
 import { Link, useNavigate } from "react-router-dom";
+import { forwardRef } from "react";
 
-const AccountDropdown = () => {
+const AccountDropdown = forwardRef((props, ref) => {
   const navigate = useNavigate();
+  
+  // Get user data from localStorage
+  const user = JSON.parse(localStorage.getItem('user')) || {};
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/login");
+    navigate("/");
   };
 
   return (
-    <div className="absolute right-0 mt-3 w-52 bg-white rounded-xl shadow-lg border z-50">
+    <div ref={ref} className="absolute right-0 mt-3 w-52 bg-white rounded-xl shadow-lg border z-50 account-dropdown">
       <ul className="py-2 text-sm text-gray-700">
         <li>
           <Link
@@ -20,15 +24,18 @@ const AccountDropdown = () => {
             Profile
           </Link>
         </li>
-
-        <li>
-          <Link
-            to="/orders"
-            className="block px-4 py-2 hover:bg-gray-100"
-          >
-            My Orders
-          </Link>
-        </li>
+        
+        {/* Admin menu item */}
+        {user.isAdmin && (
+          <li>
+            <Link
+              to="/admin/dashboard"
+              className="block px-4 py-2 hover:bg-gray-100 text-blue-600 font-medium"
+            >
+              Admin Dashboard
+            </Link>
+          </li>
+        )}
 
         <li>
           <Link
@@ -50,6 +57,6 @@ const AccountDropdown = () => {
       </ul>
     </div>
   );
-};
+});
 
 export default AccountDropdown;

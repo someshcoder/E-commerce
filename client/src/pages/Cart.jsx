@@ -1,10 +1,11 @@
 // Cart.jsx - Ultra Premium & Professional Cart Page (2025 e-commerce style)
 import { useState } from 'react';
 import { useCart } from "../context/CartContext";
-import { Trash2, Plus, Minus, Truck, ShieldCheck, CreditCard, ArrowLeft, ChevronRight, Tag, Gift, CheckCircle2, RefreshCw } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Trash2, Plus, Minus, Truck, ShieldCheck, CreditCard, ArrowLeft, ChevronRight, Tag, Gift, CheckCircle2, RefreshCw, ShoppingCart } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Cart = () => {
+  const navigate = useNavigate();
   const {
     cartItems,
     removeFromCart,
@@ -258,10 +259,31 @@ const Cart = () => {
                   )}
                 </div>
 
-                {/* Checkout */}
-                <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-5 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-[1.02] shadow-xl flex items-center justify-center gap-3">
-                  <CreditCard size={22} /> Proceed to Checkout
-                </button>
+                {/* Buy Now & Checkout */}
+                <div className="space-y-4">
+                  <button 
+                    onClick={() => {
+                      // Redirect to checkout page with normalized cart items for immediate purchase
+                      if (cartItems && cartItems.length > 0) {
+                        // Normalize cart items to ensure consistent structure
+                        const normalizedCartItems = cartItems.map(item => {
+                          const { product, quantity, id } = getProductDetails(item);
+                          return {
+                            ...product,
+                            quantity: quantity,
+                            id: id
+                          };
+                        });
+                        navigate('/checkout', { state: { cartItems: normalizedCartItems, buyNow: true } });
+                      }
+                    }}
+                    className="w-full flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white py-4 px-6 rounded-xl font-semibold text-lg transition shadow-lg hover:shadow-xl"
+                    disabled={cartItems.length === 0}
+                  >
+                    <ShoppingCart size={22} />
+                    Place Order
+                  </button>
+                </div>
 
                 {/* Trust Badges */}
                 <div className="mt-10 grid grid-cols-3 gap-6 text-center text-xs md:text-sm">
