@@ -1,18 +1,36 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ShoppingBag, Search, User, Heart, Menu, X, ChevronDown } from "lucide-react";
 import { useCart } from "../context/CartContext";
-import { useWishlist } from "../context/WishlistContext";
 import AccountDropdown from "./AccountDropdown";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const Header = () => {
   const [searchParams] = useSearchParams();
-  const { cartItems } = useCart();
-  const { wishlist } = useWishlist();
+  const { cartItems, wishlist } = useCart();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || "");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const accountDropdownRef = useRef(null);
+  const accountDropdownButtonRef = useRef(null);
   const navigate = useNavigate();
+  
+  // Check if user is authenticated
+  const isAuthenticated = localStorage.getItem('user') !== null;
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (open && accountDropdownButtonRef.current && !accountDropdownButtonRef.current.contains(event.target) && 
+          accountDropdownRef.current && !accountDropdownRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open]);
 
   // Update search query when URL parameter changes
   useEffect(() => {
@@ -127,7 +145,7 @@ const Header = () => {
             >
               <div className="relative">
                 <ShoppingBag size={22} strokeWidth={1.8} />
-                {cartItems.length > 0 && (
+                {isAuthenticated && cartItems.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md animate-pulse-once">
                     {cartItems.length}
                   </span>
@@ -143,7 +161,7 @@ const Header = () => {
             >
               <div className="relative">
                 <Heart size={20} strokeWidth={1.8} className="hover:fill-red-500 transition-all duration-300" />
-                {wishlist.length > 0 && (
+                {isAuthenticated && wishlist.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md animate-pulse-once">
                     {wishlist.length}
                   </span>
@@ -152,26 +170,30 @@ const Header = () => {
               <span className="hidden lg:block text-xs font-medium">Wishlist</span>
             </Link>
 
-            {/* Account Dropdown */}
-            <div className="relative hidden md:block">
-              <button
-                onClick={() => setOpen(!open)}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm font-semibold text-gray-800 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all duration-300"
-              >
-                <User size={18} strokeWidth={1.8} />
-                Account <ChevronDown size={14} />
-              </button>
-
-              {open && <AccountDropdown />}
-            </div>
-
             {/* Login Button (Prominent) */}
-            <Link
-              to="/login"
-              className="hidden md:flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg"
-            >
-              <User size={16} /> Login
-            </Link>
+            {!isAuthenticated && (
+              <Link
+                to="/login"
+                className="hidden md:flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg"
+              >
+                <User size={16} /> Login
+              </Link>
+            )}
+
+            {/* Account Dropdown */}
+            {isAuthenticated && (
+              <div className="relative hidden md:block">
+                <button
+                  ref={accountDropdownButtonRef}
+                  onClick={() => setOpen(!open)}
+                  className="hidden md:flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg"
+                >
+                  <User size={16} /> Account <ChevronDown size={14} />
+                </button>
+
+                {open && <div ref={accountDropdownRef}><AccountDropdown /></div>}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -199,13 +221,31 @@ const Header = () => {
             <Link to="/products" className="block hover:text-blue-600 transition-colors">Products</Link>
             <Link to="/about" className="block hover:text-blue-600 transition-colors">About</Link>
             <Link to="/contact" className="block hover:text-blue-600 transition-colors">Contact</Link>
-            <Link to="/cart" className="block hover:text-blue-600 transition-colors">Cart</Link>
-            <Link to="/wishlist" className="block hover:text-blue-600 transition-colors">Wishlist</Link>
+            <div className="flex items-center justify-between">
+              <Link to="/cart" className="block hover:text-blue-600 transition-colors flex-1">Cart</Link>
+              {isAuthenticated && cartItems.length > 0 && (
+                <span className="bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ml-2">
+                  {cartItems.length}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center justify-between">
+              <Link to="/wishlist" className="block hover:text-blue-600 transition-colors flex-1">Wishlist</Link>
+              {isAuthenticated && wishlist.length > 0 && (
+                <span className="bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ml-2">
+                  {wishlist.length}
+                </span>
+              )}
+            </div>
             <Link to="/profile" className="block hover:text-blue-600 transition-colors">Profile</Link>
             <Link to="/orders" className="block hover:text-blue-600 transition-colors">My Orders</Link>
             <Link to="/settings" className="block hover:text-blue-600 transition-colors">Settings</Link>
             <Link to="/login" className="block text-blue-600 hover:text-blue-700 transition-colors">Login</Link>
-            <Link to="/logout" className="block text-red-600 hover:text-red-700 transition-colors">Logout</Link>
+            <button onClick={() => {
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('user');
+                            navigate('/');
+                          }} className="block text-red-600 hover:text-red-700 transition-colors w-full text-left">Logout</button>
           </nav>
         </div>
       )}
