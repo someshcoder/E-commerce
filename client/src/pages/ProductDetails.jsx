@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom'; 
+import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom'; 
 import { useCart } from '../context/CartContext';
 import { Heart, ShoppingCart, Star, Share2, ChevronLeft, ChevronRight, Truck, ShieldCheck, RefreshCw } from 'lucide-react';
 const getProductById = (id) => {
@@ -1068,7 +1068,7 @@ const getProductById = (id) => {
       id: 45,
       title: "Biozyme Performance Whey Protein Powder",
       price: 299,
-      rating: 4.7,
+      rating: 4.7, 
       reviews: 23456,
       image: "https://m.media-amazon.com/images/I/71VnwikGbSL._SX679_.jpg",
       category: "Essentials",
@@ -1096,6 +1096,7 @@ const getProductById = (id) => {
 
 const ProductDetail = () => {
   const { id } = useParams(); // get product id from URL
+  const navigate = useNavigate();
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist, wishlist } = useCart();
 
   const [product, setProduct] = useState(null);
@@ -1110,21 +1111,21 @@ const ProductDetail = () => {
     const fetchProductAndRelated = async () => {
       try {
         setLoading(true);
-        
-        // Fetch the main product
+          
+        // Fetch from Products collection only (not TopDeals)
         const productResponse = await fetch(`http://localhost:5000/api/products/${id}`);
         if (!productResponse.ok) {
           throw new Error('Product not found');
         }
         const productData = await productResponse.json();
         setProduct(productData);
-        
-        // Fetch related products from the same category
+          
+        // Fetch related products from the same category (from products collection)
         const relatedResponse = await fetch(`http://localhost:5000/api/products?category=${productData.category}&limit=4`);
         if (relatedResponse.ok) {
           const relatedData = await relatedResponse.json();
           // Filter out the current product from related products
-          const filteredRelated = relatedData.filter(p => p._id !== productData._id);
+          const filteredRelated = relatedData.filter(p => p._id !== productData._id && p.id !== productData.id);
           setRelatedProducts(filteredRelated);
         }
       } catch (err) {
@@ -1134,7 +1135,7 @@ const ProductDetail = () => {
         setLoading(false);
       }
     };
-    
+      
     fetchProductAndRelated();
   }, [id]);
 
@@ -1164,7 +1165,7 @@ const ProductDetail = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="text-sm text-gray-600 mb-6">
-          Home / {product.category} / <span className="text-gray-900 font-medium">{product.title}</span>
+          Home {product.category && `/ ${product.category}`} / <span className="text-gray-900 font-medium">{product.title}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
@@ -1172,11 +1173,17 @@ const ProductDetail = () => {
           <div className="space-y-6">
             {/* Main Image with Zoom */}
             <div className="relative bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-lg group">
-              <img
-                src={product.images[selectedImage]}
-                alt={product.title}
-                className="w-full h-[500px] md:h-[600px] object-contain transition-transform duration-500 group-hover:scale-110"
-              />
+              {product.images && product.images.length > 0 ? (
+                <img
+                  src={product.images[selectedImage]}
+                  alt={product.title}
+                  className="w-full h-[500px] md:h-[600px] object-contain transition-transform duration-500 group-hover:scale-110"
+                />
+              ) : (
+                <div className="w-full h-[500px] md:h-[600px] flex items-center justify-center bg-gray-100">
+                  <span className="text-gray-500">No image available</span>
+                </div>
+              )}
               {/* Zoom hint */}
               <div className="absolute bottom-4 right-4 bg-black/70 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm">
                 Hover to Zoom
@@ -1185,7 +1192,7 @@ const ProductDetail = () => {
 
             {/* Thumbnails */}
             <div className="flex gap-4 overflow-x-auto pb-4">
-              {product.images.map((img, index) => (
+              {product.images && product.images.map((img, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
@@ -1202,26 +1209,57 @@ const ProductDetail = () => {
           <div className="space-y-8">
             {/* Title & Rating */}
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
-                {product.title}
-              </h1>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
+                  {product.title}
+                </h1>
+                {product.tag && (
+                  <span className="px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm font-semibold">
+                    {product.tag}
+                  </span>
+                )}
+              </div>
 
               <div className="flex items-center gap-4 mt-4">
-                <div className="flex items-center bg-green-600 text-white px-3 py-1 rounded-md text-sm font-medium">
-                  {product.rating} <Star size={16} className="ml-1 fill-white" />
-                </div>
-                <span className="text-gray-600 text-sm">
-                  {product.reviews.toLocaleString()} Ratings
-                </span>
+                {product.rating && (
+                  <div className="flex items-center bg-green-600 text-white px-3 py-1 rounded-md text-sm font-medium">
+                    {product.rating} <Star size={16} className="ml-1 fill-white" />
+                  </div>
+                )}
+                {product.reviews && (
+                  <span className="text-gray-600 text-sm">
+                    {product.reviews.toLocaleString()} Ratings
+                  </span>
+                )}
               </div>
             </div>
 
             {/* Price */}
             <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="text-4xl md:text-5xl font-bold text-gray-900">
-                ₹{(product.price * quantity).toLocaleString()}
+              <div className="flex items-end gap-3">
+                {product.price && (
+                  <div className="text-4xl md:text-5xl font-bold text-gray-900">
+                    ₹{(product.price * quantity).toLocaleString()}
+                  </div>
+                )}
+                {product.mrp && product.mrp > product.price && (
+                  <div className="text-xl text-gray-500 line-through mb-2">
+                    ₹{(product.mrp * quantity).toLocaleString()}
+                  </div>
+                )}
               </div>
-              <p className="text-sm text-gray-500 mt-2">₹{product.price.toLocaleString()} × {quantity} item{quantity > 1 ? 's' : ''}</p>
+              
+              {product.discount && product.discount > 0 && (
+                <div className="mt-2">
+                  <span className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+                    {product.discount}% OFF - Save ₹{((product.mrp - product.price) * quantity).toLocaleString()}
+                  </span>
+                </div>
+              )}
+              
+              {product.price && (
+                <p className="text-sm text-gray-500 mt-2">₹{product.price.toLocaleString()} × {quantity} item{quantity > 1 ? 's' : ''}</p>
+              )}
               <p className="text-sm text-gray-500 mt-1">Inclusive of all taxes</p>
             </div>
 
@@ -1245,7 +1283,7 @@ const ProductDetail = () => {
 
               <div className="flex-1 flex flex-col sm:flex-row gap-4">
                 <button 
-                  onClick={() => product && addToCart({...product, quantity})}
+                  onClick={() => product && addToCart({...product, quantity: quantity || 1})}
                   className="flex-1 flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold text-lg transition transform hover:scale-[1.02] shadow-lg">
                   <ShoppingCart size={22} />
                   Add to Cart
@@ -1264,16 +1302,16 @@ const ProductDetail = () => {
                 >
                   <Heart
                     size={22}
-                    className={isInWishlist(product.id) ? "fill-red-500 text-red-500" : "text-gray-700"}
+                    className={product && isInWishlist(product.id) ? "fill-red-500 text-red-500" : "text-gray-700"}
                   />
                 </button>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (navigator.share) {
+                    if (navigator.share && product) {
                       navigator.share({
                         title: product.title,
-                        text: `Check out ${product.title} for ₹${product.price.toLocaleString()}!`,
+                        text: `Check out ${product.title} for ₹${product.price ? product.price.toLocaleString() : '0'}!`,
                         url: window.location.href,
                       });
                     } else {
@@ -1317,35 +1355,36 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Additional Actions */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-              <Link
-                to="/product-management?from=product-details"
-                className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-xl font-medium transition"
+            {/* Buy Now Button */}
+            <div className="mt-6">
+              <button
+                onClick={() => {
+                  // Redirect to checkout page with product data
+                  if (product) {
+                    navigate('/checkout', { state: { product: {...product, quantity: quantity || 1}, buyNow: true } });
+                  }
+                }}
+                className="w-full flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white py-4 px-6 rounded-xl font-semibold text-lg transition shadow-lg hover:shadow-xl"
+                disabled={!product}
               >
-                <ShoppingCart size={20} />
-                Place Product
-              </Link>
-              <Link
-                to="/product-management"
-                className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-xl font-medium transition"
-              >
-                <ShoppingCart size={20} />
-                Product History
-              </Link>
+                <ShoppingCart size={22} />
+                Buy Now
+              </button>
             </div>
 
             {/* Description */}
             <div className="bg-white p-6 rounded-2xl border border-gray-200">
               <h2 className="text-2xl font-bold mb-4">About this item</h2>
-              <p className="text-gray-700 leading-relaxed">{product.description}</p>
+              {product.description && (
+                <p className="text-gray-700 leading-relaxed">{product.description}</p>
+              )}
             </div>
 
             {/* Specifications */}
             <div className="bg-white p-6 rounded-2xl border border-gray-200">
               <h2 className="text-2xl font-bold mb-4">Specifications</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {product.specs.map((spec, index) => (
+                {product.specs && product.specs.map((spec, index) => (
                   <div key={index} className="flex justify-between py-2 border-b border-gray-100 last:border-b-0">
                     <span className="text-gray-600 font-medium">{spec.key}</span>
                     <span className="text-gray-900">{spec.value}</span>
