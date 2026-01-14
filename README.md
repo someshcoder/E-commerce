@@ -1,7 +1,7 @@
 # ShopKart - Modern E-commerce Platform
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/yourusername/ecommerce-app/main/client/src/assets/logo.png" alt="ShopKart Logo" width="200" height="200">
+  <img src="/src/assets/logo.png" alt="ShopKart Logo" width="200" height="200">
 </p>
 
 <div align="center">
@@ -250,7 +250,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For support, please contact:
-- **Email**: somesh.bhatnagar@example.com
+- **Email**: someshbhatnagar535@example.com
 - **GitHub Issues**: [Submit an issue](https://github.com/yourusername/ecommerce-app/issues)
 
 ---
@@ -259,11 +259,14 @@ For support, please contact:
 
 **Somesh Bhatnagar** - Full Stack Developer passionate about creating modern web applications with exceptional user experiences.
 
-<a href="https://linkedin.com/in/someshbhatnagar">
+<a href="in/somesh-bhatnagar-18b388328">
   <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />
 </a>
-<a href="https://twitter.com/someshdev">
-  <img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white" />
+<a href="https://www.instagram.com/bhatnagarsomesh/">
+  <img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" />
+</a>
+<a href="https://github.com/someshcoder">
+  <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" />
 </a>
 
 ---
