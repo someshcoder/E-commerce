@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import TopDealDetail from "./pages/TopDealDetail";
+import OrderDetail from "./pages/OrderDetail";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -14,6 +15,7 @@ import Settings from './pages/Settings';
 import AdminDashboard from './pages/AdminDashboard';
 import CustomerManagement from './pages/CustomerManagement';
 import ProductsManagement from './pages/ProductsManagement';
+import OrdersManagement from './pages/OrdersManagement';
 import Checkout from './pages/Checkout';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -38,6 +40,7 @@ function App() {
           <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
           <Route path="/product/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
           <Route path="/topdeal/:id" element={<ProtectedRoute><TopDealDetail /></ProtectedRoute>} />
+          <Route path="/order/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
           <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
           <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
@@ -48,7 +51,7 @@ function App() {
           <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/products" element={<ProtectedRoute><ProductsManagement /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/admin/orders" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/orders" element={<ProtectedRoute><OrdersManagement /></ProtectedRoute>} />
           <Route path="/admin/customers" element={<ProtectedRoute><CustomerManagement /></ProtectedRoute>} />
         </Routes>
 
