@@ -1,7 +1,7 @@
 # ShopKart - Modern E-commerce Platform
 
 <p align="center">
-  <img src="/src/assets/logo.png" alt="ShopKart Logo" width="200" height="200">
+  <img src="./client/src/assets/logo.png" alt="ShopKart Logo" width="200" height="200">
 </p>
 
 <div align="center">
