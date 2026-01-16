@@ -259,7 +259,7 @@ For support, please contact:
 
 **Somesh Bhatnagar** - Full Stack Developer passionate about creating modern web applications with exceptional user experiences.
 
-<a href="in/somesh-bhatnagar-18b388328">
+<a href="https://www.linkedin.com/in/somesh-bhatnagar-18b388328/">
   <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" />
 </a>
 <a href="https://www.instagram.com/bhatnagarsomesh/">
