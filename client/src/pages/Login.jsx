@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Eye, EyeOff, Mail, Lock, ArrowRight, ShoppingBag } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [showMessage, setShowMessage] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -11,6 +13,16 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (searchParams.get('message') === 'login_required') {
+      setShowMessage(true);
+      // Clear the message from URL after showing it
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 3000);
+    }
+  }, [searchParams]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,11 +64,44 @@ const Login = () => {
       
       if (response.ok) {
         alert('Login successful! 🎉 Welcome back!');
-        // Store token in localStorage if needed
         if (data.token) {
           localStorage.setItem('token', data.token);
         }
-        navigate('/');
+        // Store user data including isAdmin status
+        if (data._id && data.email && data.name) {
+          const userData = {
+            id: data._id,
+            name: data.name,
+            email: data.email,
+            isAdmin: data.isAdmin || false
+          };
+          localStorage.setItem('user', JSON.stringify(userData));
+          
+          // Check if user came from a protected route
+          const urlParams = new URLSearchParams(window.location.search);
+          const fromUrlParam = urlParams.get('from');
+          
+          // Also check session storage for redirect after registration
+          const redirectFromStorage = sessionStorage.getItem('redirectAfterLogin');
+          
+          if (fromUrlParam) {
+            // Use the from parameter from URL if available
+            navigate(decodeURIComponent(fromUrlParam));
+            // Clear from session storage if it exists
+            sessionStorage.removeItem('redirectAfterLogin');
+          } else if (redirectFromStorage) {
+            // Use redirect from session storage
+            navigate(redirectFromStorage);
+            // Clear from session storage
+            sessionStorage.removeItem('redirectAfterLogin');
+          } else if (userData.isAdmin) {
+            navigate('/admin/dashboard');
+          } else {
+            navigate('/');
+          }
+        } else {
+          navigate('/');
+        }
       } else {
         setErrors({ server: data.message || 'Login failed' });
         setIsLoading(false);
@@ -69,128 +114,131 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Animated background particles */}
-      <div className="absolute inset-0 opacity-30 pointer-events-none">
-        <div className="absolute top-10 left-10 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
-      </div>
-
-      <div className="relative w-full max-w-lg">
-        {/* Glassmorphism Login Card */}
-        <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl p-10 md:p-12 transform transition-all duration-500 hover:shadow-[0_35px_60px_-15px_rgba(0,0,0,0.6)]">
-          {/* Title */}
-          <div className="text-center mb-10">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-              Welcome Back to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-pink-400">ShopKart</span>
-            </h1>
-            <p className="text-gray-300 mt-3 text-lg">
-              Sign in to continue your premium shopping journey
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-8 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4">
+              <ShoppingBag className="text-purple-600" size={32} />
+            </div>
+            <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
+            <p className="text-purple-100">Sign in to continue shopping</p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Email */}
-            <div className="relative">
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-5 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 outline-none transition-all duration-300 peer"
-                placeholder=" "
-              />
-              <label className="absolute left-5 top-4 text-gray-400 transition-all duration-300 pointer-events-none peer-focus:-top-3 peer-focus:text-sm peer-focus:text-blue-400 peer-focus:bg-gray-900/80 peer-focus:px-2 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base">
-                Email Address
-              </label>
-              {errors.email && <p className="text-red-400 text-sm mt-2">{errors.email}</p>}
-            </div>
-
-            {/* Password */}
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-5 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 outline-none transition-all duration-300 peer pr-12"
-                placeholder=" "
-              />
-              <label className="absolute left-5 top-4 text-gray-400 transition-all duration-300 pointer-events-none peer-focus:-top-3 peer-focus:text-sm peer-focus:text-blue-400 peer-focus:bg-gray-900/80 peer-focus:px-2 peer-placeholder-shown:top-4 peer-placeholder-shown:text-base">
-                Password
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-              {errors.password && <p className="text-red-400 text-sm mt-2">{errors.password}</p>}
-            </div>
-
-            {/* Forgot Password */}
-            <div className="flex justify-end">
-              <Link to="/forgot-password" className="text-blue-400 hover:text-blue-300 text-sm transition-colors">
-                Forgot password?
-              </Link>
-            </div>
-
-            {/* Login Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl flex items-center justify-center gap-3 shadow-lg relative overflow-hidden group ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
-            >
-              {isLoading ? (
-                <span className="animate-pulse">Signing In...</span>
-              ) : (
-                <>
-                  Sign In <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                </>
-              )}
-              {/* Shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-            </button>
-            
-            {/* Server Error Message */}
-            {errors.server && (
-              <p className="text-red-400 text-sm mt-2 text-center">{errors.server}</p>
+          <div className="p-8">
+            {showMessage && (
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200 text-center">
+                <p className="text-blue-800 font-medium">You need to login first to access that page.</p>
+              </div>
             )}
-          </form>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                    placeholder="Enter your email"
+                  />
+                </div>
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              </div>
 
-          {/* Social Login */}
-          <div className="mt-10">
-            <div className="relative">
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+              </div>
+
+              {/* Forgot Password */}
+              <div className="flex justify-end">
+                <Link to="/forgot-password" className="text-purple-600 hover:text-purple-700 text-sm font-medium transition-colors">
+                  Forgot password?
+                </Link>
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl ${
+                  isLoading ? 'opacity-70 cursor-not-allowed' : ''
+                }`}
+              >
+                {isLoading ? (
+                  <span>Signing In...</span>
+                ) : (
+                  <>
+                    Sign In <ArrowRight size={20} />
+                  </>
+                )}
+              </button>
+
+              {errors.server && (
+                <p className="text-red-500 text-sm text-center">{errors.server}</p>
+              )}
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-600"></div>
+                <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-gray-900 text-gray-400">Or continue with</span>
+                <span className="px-3 bg-white text-gray-500">Or continue with</span>
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              <button className="flex items-center justify-center gap-3 py-3.5 px-4 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl hover:bg-white/20 transition-all duration-300 text-white">
-                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-6 h-6" />
-                Google
+            {/* Social Login */}
+            <div className="grid grid-cols-2 gap-3">
+              <button className="flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+                <span className="text-sm font-medium text-gray-700">Google</span>
               </button>
-              <button className="flex items-center justify-center gap-3 py-3.5 px-4 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl hover:bg-white/20 transition-all duration-300 text-white">
-                <img src="https://www.facebook.com/favicon.ico" alt="Facebook" className="w-6 h-6" />
-                Facebook
+              <button className="flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <img src="https://www.facebook.com/favicon.ico" alt="Facebook" className="w-5 h-5" />
+                <span className="text-sm font-medium text-gray-700">Facebook</span>
               </button>
             </div>
-          </div>
 
-          {/* Register Link */}
-          <p className="text-center text-gray-300 mt-10">
-            Don’t have an account?{' '}
-            <Link to="/register" className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
-              Register now
-            </Link>
-          </p>
+            {/* Register Link */}
+            <p className="text-center text-gray-600 mt-6 text-sm">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-purple-600 hover:text-purple-700 font-semibold">
+                Sign up
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
