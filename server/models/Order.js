@@ -36,6 +36,11 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: "Placed",
     },
+
+    paymentId: {
+      type: String,
+      required: false, // Not required since cash on delivery won't have paymentId
+    },
   },
   { timestamps: true }
 );

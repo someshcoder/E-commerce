@@ -39,14 +39,14 @@ export function ContactPage() {
     {
       icon: Mail,
       title: 'Email Us',
-      content: 'support@yourstore.com',
-      subContent: 'sales@yourstore.com',
+      content: 'someshbhatnagr535@gmail.com',
+      subContent: 'someshbhatnagr544@gmail.com',
       color: 'blue',
     },
     {
       icon: Phone,
       title: 'Call Us',
-      content: '+1 (555) 123-4567',
+      content: '+91 8533002305',
       subContent: 'Mon-Fri, 9AM-6PM EST',
       color: 'green',
     },
@@ -187,7 +187,7 @@ export function ContactPage() {
                         onChange={handleInputChange}
                         required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                        placeholder="John Doe"
+                        placeholder="Somesh Bhatnagar"
                       />
                     </div>
                     <div>
@@ -202,7 +202,7 @@ export function ContactPage() {
                         onChange={handleInputChange}
                         required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                        placeholder="john@example.com"
+                        placeholder="somesh@example.com"
                       />
                     </div>
                   </div>

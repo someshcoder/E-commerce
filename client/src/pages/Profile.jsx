@@ -816,19 +816,6 @@ const ProfilePage = () => {
                           <div className="text-lg text-gray-900">₹{order.total.toLocaleString()}</div>
                         </div>
                         <div className="flex gap-2 w-full md:w-auto">
-                          {!userData.isAdmin && (
-                            <Button
-                              className="flex-1 md:flex-none"
-                              variant="outline"
-                              onClick={() => {
-                                // Pass the actual order ID for tracking
-                                setSelectedOrder(order);
-                                setShowTracker(true);
-                              }}
-                            >
-                              Track Order
-                            </Button>
-                          )}
                           <Button 
                             className="flex-1 md:flex-none"
                             onClick={() => {

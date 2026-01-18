@@ -1100,8 +1100,9 @@ const seedProducts = async () => {
     console.log('Cleared existing products');
 
     // Insert new products
-    await Product.insertMany(products);
-    console.log('Products seeded successfully');
+    console.log(`Total products to insert: ${products.length}`);
+    const result = await Product.insertMany(products);
+    console.log(`Products seeded successfully: ${result.length} products inserted`);
 
     mongoose.connection.close();
   } catch (error) {

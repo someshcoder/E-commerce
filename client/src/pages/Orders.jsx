@@ -1,52 +1,94 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Package, Truck, CheckCircle, Clock, ChevronRight, AlertCircle, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Orders = () => {
-  const [orders, setOrders] = useState([
-    {
-      id: 'SK12345',
-      date: '12 Jan 2026',
-      status: 'Delivered',
-      total: '₹4,999',
-      items: 3,
-      tracking: 'DELIVERED',
-      color: 'text-green-600 bg-green-100',
-      icon: CheckCircle,
-    },
-    {
-      id: 'SK12346',
-      date: '20 Jan 2026',
-      status: 'In Transit',
-      total: '₹12,499',
-      items: 5,
-      tracking: 'OUT FOR DELIVERY',
-      color: 'text-yellow-600 bg-yellow-100',
-      icon: Truck,
-    },
-    {
-      id: 'SK12347',
-      date: '05 Jan 2026',
-      status: 'Processing',
-      total: '₹2,799',
-      items: 2,
-      tracking: 'ORDER CONFIRMED',
-      color: 'text-blue-600 bg-blue-100',
-      icon: Clock,
-    },
-    {
-      id: 'SK12348',
-      date: '28 Dec 2025',
-      status: 'Cancelled',
-      total: '₹1,999',
-      items: 1,
-      tracking: 'CANCELLED BY USER',
-      color: 'text-red-600 bg-red-100',
-      icon: AlertCircle,
-    },
-  ]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [loading, setLoading] = useState(false); // For future real API loading
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/orders/my-orders', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Transform the data to match the UI format
+          const transformedOrders = data.map(order => {
+            const totalAmount = order.products.reduce((sum, item) => {
+              return sum + (item.productId.price * item.quantity);
+            }, 0);
+            
+            let statusDisplay, color, icon;
+            switch (order.status) {
+              case 'Delivered':
+                statusDisplay = 'Delivered';
+                color = 'text-green-600 bg-green-100';
+                icon = CheckCircle;
+                break;
+              case 'Shipped':
+                statusDisplay = 'In Transit';
+                color = 'text-yellow-600 bg-yellow-100';
+                icon = Truck;
+                break;
+              case 'Packed':
+                statusDisplay = 'Processing';
+                color = 'text-blue-600 bg-blue-100';
+                icon = Clock;
+                break;
+              case 'Placed':
+                statusDisplay = 'Processing';
+                color = 'text-blue-600 bg-blue-100';
+                icon = Clock;
+                break;
+              case 'Cancelled':
+                statusDisplay = 'Cancelled';
+                color = 'text-red-600 bg-red-100';
+                icon = AlertCircle;
+                break;
+              default:
+                statusDisplay = order.status;
+                color = 'text-gray-600 bg-gray-100';
+                icon = Package;
+            }
+            
+            return {
+              _id: order._id,
+              id: order._id.substring(0, 8),
+              date: new Date(order.createdAt).toLocaleDateString(),
+              status: order.status,
+              statusDisplay,
+              total: `₹${totalAmount.toLocaleString()}`,
+              items: order.products.length,
+              tracking: order.status,
+              color,
+              icon,
+              address: order.address,
+              paymentMethod: order.paymentMethod,
+              products: order.products
+            };
+          });
+          
+          setOrders(transformedOrders);
+        } else {
+          console.error('Failed to fetch orders');
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 md:py-20">
@@ -110,7 +152,7 @@ const Orders = () => {
 
                   <div className={`inline-flex items-center gap-2 px-5 py-2 rounded-full font-medium ${order.color}`}>
                     <order.icon size={18} />
-                    {order.status}
+                    {order.statusDisplay || order.status}
                   </div>
                 </div>
 
@@ -149,7 +191,7 @@ const Orders = () => {
                   {/* Action */}
                   <div className="flex flex-col justify-end">
                     <Link
-                      to={`/order/${order.id}`}
+                      to={`/order/${order._id}`}
                       className="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:scale-[1.02]"
                     >
                       View Details <ChevronRight size={18} />

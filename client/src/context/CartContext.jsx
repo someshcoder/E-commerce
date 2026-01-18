@@ -3,8 +3,33 @@ import { createContext, useContext, useState, useEffect } from "react";
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    // Load cart from localStorage if no user is logged in
+    const savedCart = localStorage.getItem('cartItems');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+  
+  const [wishlist, setWishlist] = useState(() => {
+    // Load wishlist from localStorage if no user is logged in
+    const savedWishlist = localStorage.getItem('wishlist');
+    return savedWishlist ? JSON.parse(savedWishlist) : [];
+  });
+
+  // Save cart to localStorage when it changes (only when not logged in)
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    }
+  }, [cartItems]);
+
+  // Save wishlist to localStorage when it changes (only when not logged in)
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    }
+  }, [wishlist]);
 
   // Load cart and wishlist from backend on component mount
   useEffect(() => {
@@ -186,7 +211,7 @@ export const CartProvider = ({ children }) => {
         // Fallback to local state if backend fails
         setCartItems(cartItems.filter((item) => {
           const itemId = item._id || item.id || (item.productId && (item.productId._id || item.productId.id));
-          return itemId === id;
+          return itemId !== id;
         }));
       }
     } catch (error) {
@@ -388,7 +413,7 @@ export const CartProvider = ({ children }) => {
     
     try {
       // Add to backend wishlist
-      const response = await fetch('http://localhost:5000/api/wishlist', {
+      const response = await fetch('http://localhost:5000/api/wishlist/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -400,11 +425,9 @@ export const CartProvider = ({ children }) => {
       });
       
       if (response.ok) {
-        const wishlistItem = await response.json();
-        // Update local state
-        if (!wishlist.find(item => item._id === wishlistItem._id || item.id === wishlistItem.productId)) {
-          setWishlist([...wishlist, wishlistItem.product]);
-        }
+        const updatedWishlist = await response.json();
+        // Update local state with the full wishlist from backend
+        setWishlist(updatedWishlist);
       } else {
         // Fallback to local state if backend fails
         if (!wishlist.find(item => item._id === product._id || item.id === product.id)) {
@@ -431,7 +454,7 @@ export const CartProvider = ({ children }) => {
     
     try {
       // Remove from backend wishlist
-      const response = await fetch(`http://localhost:5000/api/wishlist/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/wishlist/remove/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -462,6 +485,14 @@ export const CartProvider = ({ children }) => {
 
   const isInWishlist = (id) => {
     return wishlist.some(item => item._id === id || item.id === id);
+  };
+
+  const getTotalPrice = () => {
+    return cartItems.reduce((total, item) => {
+      const price = item.price || 0;
+      const quantity = item.quantity || 1;
+      return total + (price * quantity);
+    }, 0);
   };
 
   const clearWishlist = async () => {
@@ -511,6 +542,7 @@ export const CartProvider = ({ children }) => {
         toggleWishlist,
         isInWishlist,
         clearWishlist,
+        getTotalPrice,
       }}
     >
       {children}

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom'; 
+import { useParams, Link, useNavigate } from 'react-router-dom'; 
 import { Star, ChevronLeft, ChevronRight, Truck, ShieldCheck, RefreshCw } from 'lucide-react';
 
 const TopDealDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -194,10 +195,13 @@ const TopDealDetail = () => {
               <div className="flex-1 flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => {
-                    // Navigate to checkout page
-                    window.location.href = '/checkout';
+                    // Redirect to checkout page with product data
+                    if (product) {
+                      navigate('/checkout', { state: { product: {...product, quantity: quantity || 1}, buyNow: true } });
+                    }
                   }}
                   className="w-full flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white py-4 px-6 rounded-xl font-semibold text-lg transition shadow-lg hover:shadow-xl"
+                  disabled={!product}
                 >
                   Buy Now
                 </button>

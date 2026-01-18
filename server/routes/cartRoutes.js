@@ -9,7 +9,7 @@ const {
   updateQuantity,
 } = require("../controllers/cartController");
 
-const protect = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 
 // Add product to cart
 router.post("/add", protect, addToCart);

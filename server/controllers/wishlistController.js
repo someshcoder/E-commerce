@@ -13,7 +13,10 @@ const addToWishlist = async (req, res) => {
   }
 
   await user.save();
-  res.json(user.wishlist);
+  
+  // Populate and return the full wishlist with product details
+  const populatedUser = await User.findById(req.user.id).populate('wishlist');
+  res.json(populatedUser.wishlist);
 };
 
 // 📥 Get Wishlist
@@ -36,8 +39,19 @@ const removeFromWishlist = async (req, res) => {
   res.json(user.wishlist);
 };
 
+// 🗑️ Clear Wishlist
+const clearWishlist = async (req, res) => {
+  const user = await User.findById(req.user.id);
+  
+  user.wishlist = [];
+  
+  await user.save();
+  res.json({ message: 'Wishlist cleared successfully' });
+};
+
 module.exports = {
   addToWishlist,
   getWishlist,
   removeFromWishlist,
+  clearWishlist,
 };

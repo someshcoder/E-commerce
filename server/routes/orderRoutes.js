@@ -7,7 +7,7 @@ const {
   getOrderById,
 } = require("../controllers/orderController");
 
-const protect = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 
 // Place new order
 router.post("/create", protect, createOrder);
