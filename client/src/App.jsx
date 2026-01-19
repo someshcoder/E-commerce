@@ -5,13 +5,14 @@ import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import TopDealDetail from "./pages/TopDealDetail";
 import OrderDetail from "./pages/OrderDetail";
+import Orders from "./pages/Orders";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Profile from "./pages/Profile";
-import Settings from './pages/Settings';
+
 import AdminDashboard from './pages/AdminDashboard';
 import CustomerManagement from './pages/CustomerManagement';
 import ProductsManagement from './pages/ProductsManagement';
@@ -45,7 +46,7 @@ function App() {
           <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
           
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
