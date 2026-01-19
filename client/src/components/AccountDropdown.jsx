@@ -39,10 +39,10 @@ const AccountDropdown = forwardRef((props, ref) => {
 
         <li>
           <Link
-            to="/settings"
+            to="/orders"
             className="block px-4 py-2 hover:bg-gray-100"
           >
-            Settings
+            My Orders
           </Link>
         </li>
 
