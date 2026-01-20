@@ -114,17 +114,7 @@ npm install
 cd client && npm install
 ```
 
-3. **Set up environment variables**
-Create a `.env` file in the `server/` directory:
-```env
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-RAZORPAY_KEY_ID=your_razorpay_key
-RAZORPAY_KEY_SECRET=your_razorpay_secret
-```
-
-4. **Run the application**
+3. **Run the application**
 ```bash
 # Start backend server
 npm run dev
