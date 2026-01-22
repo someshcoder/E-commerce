@@ -6,6 +6,13 @@ const OrderDetail = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [customerName, setCustomerName] = useState('');
+
+  // Get customer name from localStorage
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    setCustomerName(user.name || 'Guest User');
+  }, []);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -234,6 +241,43 @@ const OrderDetail = () => {
                 ))}
               </div>
             </div>
+
+            {/* Shipping Info */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Shipping Information</h2>
+              
+              <div className="space-y-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <User size={20} className="text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 mb-2">Customer Name</p>
+                    <p className="text-sm text-gray-600">{customerName}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <MapPin size={20} className="text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 mb-2">Delivery Address</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">{order.address}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CreditCard size={20} className="text-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900 mb-2">Payment Method</p>
+                    <p className="text-sm text-gray-600 capitalize">{order.paymentMethod}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Right Column - Order Summary */}
@@ -274,48 +318,6 @@ const OrderDetail = () => {
                     <span>Total</span>
                     <span>₹{totalAmount.toLocaleString()}</span>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Shipping Info */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Shipping Information</h2>
-              
-              <div className="space-y-5">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MapPin size={20} className="text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900 mb-2">Delivery Address</p>
-                    <p className="text-sm text-gray-600 leading-relaxed">{order.address}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CreditCard size={20} className="text-green-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900 mb-2">Payment Method</p>
-                    <p className="text-sm text-gray-600 capitalize">{order.paymentMethod}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Customer Info */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Customer Information</h2>
-              
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <User size={20} className="text-purple-600" />
-                </div>
-                <div>
-                  <p className="font-medium text-gray-900 mb-2">Customer</p>
-                  <p className="text-sm text-gray-600">Somesh Bhatnagar</p>
                 </div>
               </div>
             </div>
