@@ -146,3 +146,85 @@
     animation-duration: 0.3s;
   }
 }
+
+/* Product Detail Page Animations */
+.product-detail-container {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Staggered animations for elements */
+.space-y-8 > *:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.space-y-8 > *:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.space-y-8 > *:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.space-y-8 > *:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.space-y-8 > *:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.space-y-8 > *:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+.space-y-8 > *:nth-child(7) {
+  animation-delay: 0.7s;
+}
+
+.space-y-8 > *:nth-child(8) {
+  animation-delay: 0.8s;
+}
+
+/* Smooth transitions for interactive elements */
+.transition-transform {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom scrollbar for related products */
+.snap-x {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #e2e8f0;
+}
+
+.snap-x::-webkit-scrollbar {
+  height: 8px;
+}
+
+.snap-x::-webkit-scrollbar-track {
+  background: #e2e8f0;
+  border-radius: 4px;
+}
+
+.snap-x::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.snap-x::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
