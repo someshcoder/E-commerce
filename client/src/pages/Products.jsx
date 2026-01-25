@@ -119,12 +119,12 @@ const Products = () => {
   };
 
   return (
-    <section className="py-10 md:py-16 bg-gray-50/50 min-h-screen">
+    <section className="py-10 md:py-16 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen products-page-container">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6 animate-fadeInUp">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               Discover Our Products
             </h1>
             <p className="mt-3 text-lg text-gray-600">
@@ -144,7 +144,7 @@ const Products = () => {
                   setSearchParams({ sort: e.target.value });
                 }
               }}
-              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-3 bg-white border-2 border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-all duration-300"
             >
               <option value="relevance">Relevance</option>
               <option value="popularity">Popularity</option>
@@ -156,15 +156,15 @@ const Products = () => {
         </div>
 
         {/* Category Tabs */}
-        <div className="mb-12 flex flex-wrap gap-3 justify-center md:justify-start">
+        <div className="mb-12 flex flex-wrap gap-3 justify-center md:justify-start animate-fadeInUp">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-6 py-3 text-sm md:text-base font-medium rounded-full transition-all duration-300 shadow-sm transform hover:scale-105
+              className={`px-6 py-3 text-sm md:text-base font-medium rounded-full transition-all duration-300 shadow-sm transform hover:scale-105 hover:shadow-md
                 ${selectedCategory === cat
-                  ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'}`}
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg ring-2 ring-blue-300'
+                  : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 border border-gray-200'}`}
             >
               {cat}
             </button>
@@ -174,27 +174,27 @@ const Products = () => {
         {/* Products Grid */}
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8">
-            {filteredProducts.map((product) => (
-              <Link to={`/product/${product.id}`} key={product.id} className="block">
+            {filteredProducts.map((product, index) => (
+              <Link to={`/product/${product.id}`} key={product.id} className="block animate-fadeInUp" style={{ animationDelay: `${index * 0.1}s` }}>
                 <div
-                  className="group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                  className="group bg-gradient-to-b from-white to-gray-50 rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 shadow-sm hover:shadow-lg"
                 >
-                  <div className="relative h-64 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+                  <div className="relative h-64 bg-gradient-to-b from-gray-50 to-gray-100 overflow-hidden">
                     <img
                       src={product.image}
                       alt={product.title}
-                      className="h-full w-full object-contain p-6 transition-transform duration-500 group-hover:scale-110"
+                      className="h-full w-full object-contain p-6 transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => { e.target.src = "https://via.placeholder.com/300x300?text=Product"; }}
                     />
 
-                    <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm z-10">
+                    <div className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm z-10 shadow-md">
                       {product.tag}
                     </div>
 
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4 z-20">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4 z-20 translate-y-4 group-hover:translate-y-0">
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
-                        className="p-3 bg-white rounded-full hover:bg-gray-100 transition transform hover:scale-110"
+                        className="p-3 bg-white rounded-full hover:bg-gray-100 transition-transform duration-300 transform hover:scale-110 shadow-md"
                         title="Add to Wishlist"
                       >
                         <Heart
@@ -204,14 +204,14 @@ const Products = () => {
                       </button>
                       <button
                         onClick={(e) => e.stopPropagation()}
-                        className="p-3 bg-white rounded-full hover:bg-gray-100 transition transform hover:scale-110"
+                        className="p-3 bg-white rounded-full hover:bg-gray-100 transition-transform duration-300 transform hover:scale-110 shadow-md"
                         title="Quick View"
                       >
                         <Eye size={22} className="text-gray-700" />
                       </button>
                       <button
                         onClick={(e) => e.stopPropagation()}
-                        className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition transform hover:scale-110"
+                        className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full hover:from-blue-700 hover:to-indigo-700 transition-transform duration-300 transform hover:scale-110 shadow-md"
                         title="Add to Cart"
                       >
                         <ShoppingCart size={22} />
@@ -233,11 +233,11 @@ const Products = () => {
                       </span>
                     </div>
 
-                    <h3 className="font-semibold text-gray-900 line-clamp-2 min-h-[3rem] group-hover:text-blue-600 transition-colors text-base">
+                    <h3 className="font-semibold text-gray-900 line-clamp-2 min-h-[3rem] group-hover:text-blue-600 transition-colors text-base mb-3">
                       {product.title}
                     </h3>
 
-                    <div className="mt-4">
+                    <div className="mt-2">
                       <span className="text-2xl md:text-3xl font-bold text-gray-900">
                         ₹{product.price.toLocaleString()}
                       </span>
@@ -248,7 +248,7 @@ const Products = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 text-gray-500 text-xl font-medium">
+          <div className="text-center py-20 text-gray-500 text-xl font-medium animate-fadeInUp">
             No products found in this category yet...
           </div>
         )}
