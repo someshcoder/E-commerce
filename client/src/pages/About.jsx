@@ -261,20 +261,21 @@ export function AboutPage() {
               {team.map((member, index) => (
                 <div
                   key={index}
-                  className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300"
+                  className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:shadow-black/25"
                 >
                   <div className="aspect-square overflow-hidden">
                     <img
                       src={member.image}
                       alt={member.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                       onError={(e) => {
                         e.target.src = 'https://via.placeholder.com/400x400?text=Image+Not+Available';
                       }}
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
-                    <h3 className="text-2xl mb-1">{member.name}</h3>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white transition-opacity duration-500 group-hover:opacity-100 opacity-100">
+                    <h3 className="text-2xl mb-1 font-bold group-hover:text-blue-300 transition-colors duration-300">{member.name}</h3>
                     <p className="text-blue-200">{member.role}</p>
                   </div>
                 </div>
