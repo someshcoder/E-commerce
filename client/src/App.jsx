@@ -18,6 +18,7 @@ import CustomerManagement from './pages/CustomerManagement';
 import ProductsManagement from './pages/ProductsManagement';
 import OrdersManagement from './pages/OrdersManagement';
 import Checkout from './pages/Checkout';
+import NotificationsPage from './pages/Notifications';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Wishlist from './components/Wishlist';
@@ -54,6 +55,9 @@ function App() {
           <Route path="/admin/users" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/orders" element={<ProtectedRoute><OrdersManagement /></ProtectedRoute>} />
           <Route path="/admin/customers" element={<ProtectedRoute><CustomerManagement /></ProtectedRoute>} />
+          
+          {/* Notification Route */}
+          <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
         </Routes>
 
         <Footer />
