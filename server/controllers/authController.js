@@ -63,7 +63,45 @@ const loginUser = async (req, res) => {
   });
 };
 
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update user fields
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    user.phone = req.body.phone || user.phone;
+    user.avatar = req.body.avatar || user.avatar;
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      phone: updatedUser.phone,
+      avatar: updatedUser.avatar,
+      isAdmin: updatedUser.isAdmin,
+      isActive: updatedUser.isActive,
+      token: jwt.sign({ id: updatedUser._id }, process.env.JWT_SECRET, {
+        expiresIn: "30d",
+      }),
+    });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  updateProfile,
 };
