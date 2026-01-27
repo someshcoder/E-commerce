@@ -122,7 +122,7 @@ const ProfilePage = () => {
       name: storedUserData?.name || 'Guest User',
       email: storedUserData?.email || 'guest@example.com',
       phone: storedUserData?.phone || '+91 98765 43210',
-      avatar: storedUserData?.avatar || 'https://images.unsplash.com/photo-1655249493799-9cee4fe983bb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBidXNpbmVzcyUyMHBlcnNvbnxlbnwxfHx8fDE3NjgxMjA0MjV8MA&ixlib=rb-4.1.0&q=80&w=1080',
+      avatar: storedUserData?.avatar || null,
       memberSince: storedUserData?.memberSince || 'January 2024',
       loyaltyPoints: storedUserData?.loyaltyPoints || 2450,
       tier: storedUserData?.isAdmin ? 'Gold Member' : 'Member',
@@ -421,9 +421,6 @@ const ProfilePage = () => {
       }
 
       setIsEditing(false);
-
-      // Update the main userData (in a real app, this would come from API response)
-      // For demo purposes, we'll just log that the update was successful
       alert('Profile updated successfully!');
     }
   };
@@ -438,8 +435,13 @@ const ProfilePage = () => {
                 {/* Avatar Section */}
                 <div className="relative group">
                   <Avatar className="w-32 h-32 border-4 border-white shadow-2xl ring-4 ring-white/30">
-                    <AvatarImage src={userData.avatar} alt={userData.name} />
-                    <AvatarFallback className="text-3xl">{userData.name.charAt(0)}</AvatarFallback>
+                    {userData.avatar ? (
+                      <AvatarImage src={userData.avatar} alt={userData.name} />
+                    ) : (
+                      <AvatarFallback className="text-3xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center w-full h-full">
+                        {userData.name.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                 </div>
 
@@ -535,7 +537,9 @@ const ProfilePage = () => {
                               {imagePreview ? (
                                 <AvatarImage src={imagePreview} alt="Profile Preview" />
                               ) : (
-                                <AvatarFallback className="text-2xl">{userData.name.charAt(0)}</AvatarFallback>
+                                <AvatarFallback className="text-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center w-full h-full">
+                                  {userData.name.charAt(0).toUpperCase()}
+                                </AvatarFallback>
                               )}
                             </Avatar>
                             <button
@@ -725,10 +729,10 @@ const ProfilePage = () => {
                       <h3 className="text-xl flex items-center gap-2">
                         Recent Orders
                       </h3>
-                      <Button variant="ghost" className="text-blue-600">
+                      {/* <Button variant="ghost" className="text-blue-600">
                         View All
                         <ChevronRight className="w-4 h-4 ml-1" />
-                      </Button>
+                      </Button> */}
                     </div>
                     <div className="space-y-4">
                       {loadingOrders ? (
