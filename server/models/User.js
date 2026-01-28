@@ -28,6 +28,16 @@ const userSchema = new mongoose.Schema(
       default: true, // Users are active by default
     },
 
+    phone: {
+      type: String,
+      default: null,
+    },
+
+    avatar: {
+      type: String,
+      default: null,
+    },
+
     // ❤️ Wishlist added here
     wishlist: [
       {
