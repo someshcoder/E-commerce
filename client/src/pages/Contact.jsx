@@ -11,28 +11,84 @@ export function ContactPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.subject.trim()) {
+      newErrors.subject = 'Subject is required';
+    }
+    
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = 'Message must be at least 10 characters';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: '',
+      });
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Simulate API call with loading delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // In a real application, you would send the data to your backend here
+      // Example: await fetch('/api/contact', { method: 'POST', body: JSON.stringify(formData) });
+      
+      // Show success message
       setSubmitSuccess(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
       
+      // Hide success message after 5 seconds
       setTimeout(() => {
         setSubmitSuccess(false);
       }, 5000);
-    }, 1500);
+      
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('There was an error sending your message. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -53,8 +109,8 @@ export function ContactPage() {
     {
       icon: MapPin,
       title: 'Visit Us',
-      content: '123 Commerce Street',
-      subContent: 'New York, NY 10001',
+      content: 'Tower A, DLF Cyber City',
+      subContent: 'Sector 25, Gurugram, Haryana 122002',
       color: 'purple',
     },
     {
@@ -185,10 +241,12 @@ export function ContactPage() {
                         name="name"
                         value={formData.name}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                         placeholder="Somesh Bhatnagar"
                       />
+                      {errors.name && (
+                        <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                      )}
                     </div>
                     <div>
                       <label htmlFor="email" className="block text-sm mb-2 text-gray-700">
@@ -200,10 +258,12 @@ export function ContactPage() {
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
                         placeholder="somesh@example.com"
                       />
+                      {errors.email && (
+                        <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                      )}
                     </div>
                   </div>
 
@@ -216,10 +276,10 @@ export function ContactPage() {
                       name="subject"
                       value={formData.subject}
                       onChange={handleInputChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${errors.subject ? 'border-red-500' : 'border-gray-300'}`}
+                      defaultValue=""
                     >
-                      <option value="">Select a subject</option>
+                      <option value="" disabled>Select a subject</option>
                       <option value="general">General Inquiry</option>
                       <option value="order">Order Support</option>
                       <option value="product">Product Question</option>
@@ -227,6 +287,9 @@ export function ContactPage() {
                       <option value="technical">Technical Support</option>
                       <option value="feedback">Feedback</option>
                     </select>
+                    {errors.subject && (
+                      <p className="mt-1 text-sm text-red-600">{errors.subject}</p>
+                    )}
                   </div>
 
                   <div>
@@ -238,11 +301,13 @@ export function ContactPage() {
                       name="message"
                       value={formData.message}
                       onChange={handleInputChange}
-                      required
                       rows={6}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none ${errors.message ? 'border-red-500' : 'border-gray-300'}`}
                       placeholder="Tell us how we can help you..."
                     ></textarea>
+                    {errors.message && (
+                      <p className="mt-1 text-sm text-red-600">{errors.message}</p>
+                    )}
                   </div>
 
                   <button
@@ -390,10 +455,10 @@ export function ContactPage() {
                     <div>
                       <h4 className="text-lg mb-2 text-gray-900">Address</h4>
                       <p className="text-gray-600">
-                        123 Commerce Street<br />
-                        Suite 400<br />
-                        New York, NY 10001<br />
-                        United States
+                        Tower A, DLF Cyber City<br />
+                        Udyog Vihar, Sector 25<br />
+                        Gurugram, Haryana 122002<br />
+                        India
                       </p>
                     </div>
                   </div>
