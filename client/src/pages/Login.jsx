@@ -97,7 +97,7 @@ const Login = () => {
           } else if (userData.isAdmin) {
             navigate('/admin/dashboard');
           } else {
-            navigate('/');
+            navigate('/profile');
           }
         } else {
           navigate('/');
