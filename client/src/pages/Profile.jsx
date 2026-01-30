@@ -286,9 +286,9 @@ const ProfilePage = () => {
         return;
       }
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors({ ...errors, image: 'File size exceeds 5MB limit' });
+      // Validate file size (max 2MB to prevent payload issues)
+      if (file.size > 2 * 1024 * 1024) {
+        setErrors({ ...errors, image: 'File size exceeds 2MB limit. Please choose a smaller image.' });
         return;
       }
 
@@ -391,37 +391,55 @@ const ProfilePage = () => {
   };
 
   // Handle save profile
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     if (validateForm()) {
-      // In a real application, you would make an API call here to save the data
-      // For now, we'll just update the local state and close the modal
-      console.log('Profile updated:', editUserData);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/auth/profile', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(editUserData)
+        });
 
-      // Update the main userData to reflect changes on the profile page
-      setUserData(prevData => ({
-        ...prevData,
-        name: editUserData.name,
-        email: editUserData.email,
-        phone: editUserData.phone,
-        avatar: editUserData.avatar
-      }));
+        if (response.ok) {
+          const updatedUser = await response.json();
+          
+          // Update the main userData to reflect changes on the profile page
+          setUserData(prevData => ({
+            ...prevData,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            phone: updatedUser.phone,
+            avatar: updatedUser.avatar
+          }));
 
-      // Update the user data in localStorage to persist changes
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        const userDataObj = JSON.parse(storedUser);
-        const updatedUserData = {
-          ...userDataObj,
-          name: editUserData.name,
-          email: editUserData.email,
-          phone: editUserData.phone,
-          avatar: editUserData.avatar
-        };
-        localStorage.setItem('user', JSON.stringify(updatedUserData));
+          // Update the user data in localStorage to persist changes
+          localStorage.setItem('user', JSON.stringify({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            phone: updatedUser.phone,
+            avatar: updatedUser.avatar,
+            isAdmin: updatedUser.isAdmin,
+            isActive: updatedUser.isActive
+          }));
+
+          // Update the token in localStorage
+          localStorage.setItem('token', updatedUser.token);
+
+          setIsEditing(false);
+          alert('Profile updated successfully!');
+        } else {
+          const errorData = await response.json();
+          alert(errorData.message || 'Failed to update profile');
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Failed to update profile. Please try again.');
       }
-
-      setIsEditing(false);
-      alert('Profile updated successfully!');
     }
   };
   return (
