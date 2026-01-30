@@ -55,6 +55,8 @@ const loginUser = async (req, res) => {
     _id: user._id,
     name: user.name,
     email: user.email,
+    phone: user.phone,
+    avatar: user.avatar,
     isAdmin: user.isAdmin,
     isActive: user.isActive,
     token: jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -74,13 +76,23 @@ const updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update user fields
-    user.name = req.body.name || user.name;
-    user.email = req.body.email || user.email;
-    user.phone = req.body.phone || user.phone;
-    user.avatar = req.body.avatar || user.avatar;
-
-    const updatedUser = await user.save();
+    // Update user fields using findByIdAndUpdate with $set to ensure new fields are saved
+    const updateData = {};
+    
+    if (req.body.name) updateData.name = req.body.name;
+    if (req.body.email) updateData.email = req.body.email;
+    if ('phone' in req.body) updateData.phone = req.body.phone;
+    if ('avatar' in req.body) updateData.avatar = req.body.avatar;
+    
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+    
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
     res.json({
       _id: updatedUser._id,
