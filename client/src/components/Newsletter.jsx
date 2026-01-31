@@ -1,10 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function Newsletter() {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+
+  // Check user role on component mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const userData = JSON.parse(storedUser);
+      setUserRole(userData.isAdmin ? 'admin' : 'user');
+    } else {
+      setUserRole('guest');
+    }
+  }, []);
 
   const validateEmail = (email) => {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -24,29 +38,84 @@ export function Newsletter() {
       return;
     }
     
+    // Only allow users (not admins) to subscribe to newsletter
+    if (userRole === 'admin') {
+      setError('Admin accounts cannot subscribe to newsletter');
+      return;
+    }
+    
+    // Check if user is a guest and restrict access
+    if (userRole === 'guest') {
+      setError('You need to login first to access that page.');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000); // Redirect after 2 seconds to show the error message
+      return;
+    }
+    
     setError('');
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Send subscription request to backend
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify({ email }),
+      });
       
-      // In a real application, you would send the data to your backend here
-      // Example: await fetch('/api/newsletter', { method: 'POST', body: JSON.stringify({ email }) });
-      
-      setIsSubmitted(true);
-      setEmail('');
-      
-      // Reset success message after 5 seconds
-      setTimeout(() => {
-        setIsSubmitted(false);
-      }, 5000);
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Send notification to admin about new subscriber
+        const notificationResponse = await fetch('http://localhost:5000/api/notifications/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+          },
+          body: JSON.stringify({
+            title: 'New Newsletter Subscription',
+            message: `A new user (${email}) has subscribed to the newsletter.`,
+            type: 'newsletter',
+            priority: 'medium',
+            recipientType: 'admin' // Only send to admins
+          }),
+        });
+        
+        if (notificationResponse.ok) {
+          console.log('Admin notification sent successfully');
+        } else {
+          console.error('Failed to send admin notification');
+        }
+        
+        setIsSubmitted(true);
+        setEmail('');
+        
+        // Reset success message after 5 seconds
+        setTimeout(() => {
+          setIsSubmitted(false);
+        }, 5000);
+      } else {
+        const errorResult = await response.json();
+        setError(errorResult.message || 'Failed to subscribe. Please try again later.');
+      }
     } catch (err) {
-      setError('Failed to subscribe. Please try again later.');
+      console.error('Subscription error:', err);
+      setError('An error occurred. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  // Don't show the newsletter section to admins
+  if (userRole === 'admin') {
+    return null;
+  }
 
   return (
     <section className="py-20 bg-gradient-to-br from-black via-gray-900 to-black text-white relative overflow-hidden">
