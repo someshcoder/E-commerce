@@ -45,20 +45,34 @@ const AccountDropdown = forwardRef((props, ref) => {
             </Link>
           </li>
           
-          {/* Admin menu item */}
+          {/* Admin menu items */}
           {user.isAdmin && (
-            <li>
-              <Link
-                to="/admin/dashboard"
-                className="flex items-center gap-3 block px-4 py-3 hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 hover:text-purple-700 transition-all duration-200 border-l-2 border-transparent hover:border-purple-500 text-purple-600 font-medium"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-shield-check">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  <path d="m9 12 2 2 4-4" />
-                </svg>
-                Admin Dashboard
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link
+                  to="/admin/dashboard"
+                  className="flex items-center gap-3 block px-4 py-3 hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 hover:text-purple-700 transition-all duration-200 border-l-2 border-transparent hover:border-purple-500 text-purple-600 font-medium"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-shield-check">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="m9 12 2 2 4-4" />
+                  </svg>
+                  Admin Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/notifications"
+                  className="flex items-center gap-3 block px-4 py-3 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 transition-all duration-200 border-l-2 border-transparent hover:border-blue-500"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bell">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                  </svg>
+                  Notifications
+                </Link>
+              </li>
+            </>
           )}
 
           <li>
